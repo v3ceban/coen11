@@ -1,0 +1,20 @@
+get hour
+
+int i
+Flight *p
+p = Flights
+
+for i 0 to 10 i++ p++
+  while p[i].hour = hour
+  	flightCount--;
+    for j i to 10 j++ {
+       code p[j-1] = p[j]
+       hour p[j-1] = p[j]
+       minute p[j-1] = p[j]
+    }
+  i--;
+  p--;
+  if (p->hour > hour) break
+  
+print "you canceled all flights at *hour*"
+return
