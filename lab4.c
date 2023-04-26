@@ -284,23 +284,28 @@ void deletebyhour(int hour)
 			printf("Flight #%s at %d:%02d is deleted\n", p->code, p->hour, p->minute);
 			for (j = i; j < flightCount; j++)
 			{
-				if (i == flightCount - 1)
-				{
-					p[j - 1].code[0] = '\0';
-					p[j - 1].hour = 0;
-					p[j - 1].minute = 0;
-				}
-				p[j - 1] = p[j];
+				// 	if (i == flightCount - 1)
+				// 	{
+				// 		p[j - 1].code[0] = '\0';
+				// 		p[j - 1].hour = 0;
+				// 		p[j - 1].minute = 0;
+				// 	}
+				p[j] = p[j + 1];
 			}
 			i--;
 			p--;
 			flightCount--;
 		}
-		if (p->hour > hour)
+		else if (p->hour > hour)
 		{
 			break;
 		}
 	}
+	for (i = 0; i < SIZE; i++)
+	{
+		printf("%d. Code: %s Time: %d:%02d\n", i + 1, p->code, p->hour, p->minute);
+	}
+
 	printf("You canceled all flights at this hour: %d\n", hour);
 	return;
 }
