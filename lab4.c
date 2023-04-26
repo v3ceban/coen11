@@ -290,7 +290,7 @@ void deletebyhour(int hour)
 				// 		p[j - 1].hour = 0;
 				// 		p[j - 1].minute = 0;
 				// 	}
-				p[j] = p[j + 1];
+				p[j - 1] = p[j];
 			}
 			i--;
 			p--;
@@ -301,7 +301,9 @@ void deletebyhour(int hour)
 			break;
 		}
 	}
-	for (i = 0; i < SIZE; i++)
+
+	// debug
+	for (i = 0, p = Flights; i < SIZE; i++, p++)
 	{
 		printf("%d. Code: %s Time: %d:%02d\n", i + 1, p->code, p->hour, p->minute);
 	}
