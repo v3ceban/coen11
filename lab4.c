@@ -15,12 +15,13 @@ Name: Vladimir Ceban
 
 int main(void);
 void empty_stdin(void);
+void removeExtras(void);
 
 void insert(void);
 void show_all(void);
 void show_by_hours(int);
 int check_duplicate(char[SIZE]);
-void delete(char[SIZE]);
+void deletebycode(char[SIZE]);
 void deletebyhour(int);
 
 // Global variables
@@ -177,6 +178,15 @@ void show_all(void)
 			}
 		}
 
+		// // DEBUG
+		// printf("DEBUG:\n");
+		// for (i = 0, p = Flights; i < SIZE; i++, p++)
+		// {
+
+		// 	printf("%d. Code: %s Time: %d:%02d\n", i + 1, p->code, p->hour, p->minute);
+		// }
+		// printf("Flights scheduled: %d\n", flightCount);
+
 		printf("Returning to main menu...\n");
 		return;
 	}
@@ -236,9 +246,9 @@ int check_duplicate(char code[SIZE])
 
 	return flag;
 }
-void delete(char code[SIZE])
+void deletebycode(char code[SIZE])
 {
-	int cancelRequest, i;
+	int i, j;
 	Flight *p;
 	p = Flights;
 
@@ -246,51 +256,32 @@ void delete(char code[SIZE])
 	{
 		if (strcmp(p->code, code) == 0)
 		{
-			cancelRequest = i;
-			break;
-		}
-		else
-		{
-			cancelRequest = -1;
+			printf("Flight #%s at %d:%02d is deleted\n", p->code, p->hour, p->minute);
+			for (j = i; j < flightCount - 1; j++)
+			{
+				p[j - i] = p[j - i + 1];
+			}
+			flightCount--;
+			removeExtras();
+			return;
 		}
 	}
-	if (cancelRequest >= 0)
-	{
-		for (i = cancelRequest; i < SIZE; i++)
-		{
-			strcpy(p[i - 1].code, p[i].code);
-			p[i - 1].hour = p[i].hour;
-			p[i - 1].minute = p[i].minute;
-		}
-		flightCount--;
-		printf("Success. Flight %s was canceled.\n", code);
-		return;
-	}
-	else
-	{
-		printf("Error: there is no such flight scheduled yet. Please try again.\n");
-		return;
-	}
+
+	printf("Error: there is no such flight scheduled yet. Please try again.\n");
+	return;
 }
 void deletebyhour(int hour)
 {
 	int i, j;
 	Flight *p;
-	p = Flights;
-	for (i = 0; i < flightCount; i++, p++)
+	for (i = 0, p = Flights; i < flightCount; i++, p++)
 	{
 		if (p->hour == hour)
 		{
 			printf("Flight #%s at %d:%02d is deleted\n", p->code, p->hour, p->minute);
-			for (j = i; j < flightCount; j++)
+			for (j = i; j < flightCount - 1; j++)
 			{
-				// 	if (i == flightCount - 1)
-				// 	{
-				// 		p[j - 1].code[0] = '\0';
-				// 		p[j - 1].hour = 0;
-				// 		p[j - 1].minute = 0;
-				// 	}
-				p[j - 1] = p[j];
+				p[j - i] = p[j - i + 1];
 			}
 			i--;
 			p--;
@@ -302,14 +293,22 @@ void deletebyhour(int hour)
 		}
 	}
 
-	// debug
-	for (i = 0, p = Flights; i < SIZE; i++, p++)
-	{
-		printf("%d. Code: %s Time: %d:%02d\n", i + 1, p->code, p->hour, p->minute);
-	}
+	removeExtras();
 
 	printf("You canceled all flights at this hour: %d\n", hour);
 	return;
+}
+void removeExtras(void)
+{
+	int i;
+	Flight *p;
+	// Wipes all flights after flightCount to clear entries for new flights
+	for (i = flightCount, p = Flights + flightCount; i < SIZE; i++, p++)
+	{
+		p->code[0] = '\0';
+		p->hour = 0;
+		p->minute = 0;
+	}
 }
 
 // Main
@@ -339,7 +338,6 @@ int main(void)
 			{
 				printf("Error: the schedule is full. Please try again tomorrow.\n");
 			}
-			printf("Flights scheduled: %d\n", flightCount);
 			break;
 
 		case 2:
@@ -398,10 +396,9 @@ int main(void)
 				else
 				{
 					empty_stdin();
-					delete (code);
+					deletebycode(code);
 				}
 			}
-			printf("Flights scheduled: %d\n", flightCount);
 			break;
 
 		case 5:
@@ -430,7 +427,6 @@ int main(void)
 					deletebyhour(hourToDelete);
 				}
 			}
-			printf("Flights scheduled: %d\n", flightCount);
 			break;
 
 		case 0:
