@@ -187,7 +187,7 @@ void show_all(void)
 		// }
 		// printf("Flights scheduled: %d\n", flightCount);
 
-		printf("Returning to main menu...\n");
+		printf("Returning to the main menu...\n");
 		return;
 	}
 	else
@@ -217,7 +217,7 @@ void show_by_hours(int hour)
 		printf("Error: no flights are scheduled for this hour. Please try again.\n");
 	}
 
-	printf("Returning to main menu...\n");
+	printf("Returning to the main menu...\n");
 	return;
 }
 void empty_stdin(void) // helper function to avoid repeating error messages on wrong inputs
@@ -235,7 +235,6 @@ int check_duplicate(char code[SIZE])
 	int flag = 0;
 	Flight *p;
 	p = Flights;
-
 	for (i = 0; i < SIZE; i++, p++)
 	{
 		if (strcmp(p->code, code) == 0)
@@ -243,16 +242,13 @@ int check_duplicate(char code[SIZE])
 			flag++;
 		}
 	}
-
 	return flag;
 }
 void deletebycode(char code[SIZE])
 {
 	int i, j;
 	Flight *p;
-	p = Flights;
-
-	for (i = 0; i < SIZE; i++, p++)
+	for (i = 0, p = Flights; i < SIZE; i++, p++)
 	{
 		if (strcmp(p->code, code) == 0)
 		{
@@ -266,7 +262,6 @@ void deletebycode(char code[SIZE])
 			return;
 		}
 	}
-
 	printf("Error: there is no such flight scheduled yet. Please try again.\n");
 	return;
 }
@@ -289,13 +284,12 @@ void deletebyhour(int hour)
 		}
 		else if (p->hour > hour)
 		{
-			break;
+			removeExtras();
+			printf("Returning to the main menu...\n");
+			return;
 		}
 	}
-
-	removeExtras();
-
-	printf("You canceled all flights at this hour: %d\n", hour);
+	printf("Error: There are no flights scheduled for %d o'clock. Returning to the main menu...\n", hour);
 	return;
 }
 void removeExtras(void)
