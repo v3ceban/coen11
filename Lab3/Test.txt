@@ -1,0 +1,6 @@
+Inputs to test the delete function:
+input hour that is not scheduled
+input when there are no flights scheduled
+input a char
+input a number followed by char
+input hour greater than 23 or less than 0
