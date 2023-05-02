@@ -1,0 +1,17 @@
+Try setting flag to:
+0
+1
+-1
+-0
+2
+a
+1a
+a1
+
+Try setting hour to values less than 0, more than 23, and not an int
+
+Try setting minute to values less than 0, more than 59, and not an int
+
+Try setting gate to not an int
+
+Check each main menu option in different order
