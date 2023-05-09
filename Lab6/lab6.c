@@ -8,10 +8,21 @@ Name: Vladimir Ceban
 
 // Includes
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // Defines
 #define SIZE 10
+#define Flight struct flight
+
+// define structure of Flight that has code, hour, and minute
+struct flight
+{
+	char code[SIZE + 1];
+	int hour;
+	int minute;
+	Flight *next;
+};
 
 int main(void);
 
@@ -24,29 +35,29 @@ int check_duplicate(char[SIZE]);
 void deletebycode(char[SIZE]);
 
 // Global variables
-
-// define structure of Flight that has code, hour, and minute
-typedef struct Flight
-{
-	char code[SIZE + 1];
-	int hour;
-	int minute;
-	// name it Flight
-} Flight;
-
-// initialize SIZE(10) flights, each has structure of Flight
-Flight Flights[SIZE];
-
-// flights counter
-int flightCount = 0;
+Flight *head = NULL;
 
 // Functions
+void empty_stdin(void) // helper function to avoid repeating error messages on wrong inputs
+{
+	int c = getchar();
+
+	while (c != '\n' && c != EOF)
+	{
+		c = getchar();
+	}
+}
+
 void insert(void)
 {
-	int hour, minute, late;
+	int hour, minute, i;
 	char code[SIZE + 1];
 	Flight *p;
-	p = Flights;
+	if ((p = (Flight *)malloc(sizeof(Flight))) == (Flight *)NULL)
+	{
+		printf("Error: memory could not be allocated\n");
+		return;
+	}
 
 	printf("Please, enter the code of the flight:\n");
 	if (scanf("%s", code) != 1)
@@ -97,151 +108,110 @@ void insert(void)
 		printf("Error: minute can be an integer from 0 to 59. Please try again.\n");
 		return;
 	}
-
-	int i, position;
-	int time = (hour * 60) + minute;
-	// if there are not flights scheduled yet - schedule to 1st position
-	if (flightCount == 0)
-	{
-		position = 0;
-	}
-	else
-	{
-		for (i = 0; i < SIZE; i++)
-		{
-			if (time < p[i].hour * 60 + p[i].minute)
-			{
-				// position is set to first element that is smaller
-				position = i;
-				break;
-			}
-			else
-			{
-				// position is set to the first empty element
-				if (strlen(p[i].code) == 0)
-				{
-					position = i;
-					break;
-				}
-			}
-		}
-		// sort arrays with respect to position
-		for (i = SIZE - 1; i > position; i--)
-		{
-			// copy elements from x-1 to x, where x starts at the end of the array
-			p[i] = p[i - 1];
-		}
-	}
-	// place data into arrays
-	p = &Flights[position];
 	strcpy(p->code, code);
 	p->hour = hour;
 	p->minute = minute;
-	flightCount++;
+	p->next = head;
+	head = p;
 	printf("Sucess: your flight was scheduled.\n");
-
 	return;
 }
 void show_all(void)
 {
-	int i;
 	Flight *p;
-	p = Flights;
+	p = head;
+	int i = 1;
 
-	if (flightCount > 0)
+	if (p == NULL)
 	{
-		for (i = 0; i != flightCount; i++, p++)
-		{
-			if (strlen(p->code) > 0)
-			{
-				printf("%d. Code: %s Time: %d:%02d\n", i + 1, p->code, p->hour, p->minute);
-			}
-		}
-
-		// // DEBUG
-		// printf("DEBUG:\n");
-		// for (i = 0, p = Flights; i < SIZE; i++, p++)
-		// {
-
-		// 	printf("%d. Code: %s Time: %d:%02d\n", i + 1, p->code, p->hour, p->minute);
-		// }
-		// printf("Flights scheduled: %d\n", flightCount);
-
-		printf("Returning to the main menu...\n");
-		return;
+		printf("Error: the schedule is empty. Please schedule a flight first.\n");
 	}
 	else
 	{
-		printf("Error: the schedule is empty. Please schedule a flight first.\n");
-		return;
-	}
-}
-void show_by_hours(int hour)
-{
-	int i;
-	int flag = 0;
-	Flight *p;
-	p = Flights;
-
-	for (i = 0; i != flightCount; i++, p++)
-	{
-		if (p->hour == hour)
+		while (p != NULL)
 		{
-			printf("%d. Code: %s Time: %d:%02d\n", i + 1, p->code, p->hour, p->minute);
-			flag++;
+			printf("%d. Code: %s Time: %d:%02d\n", i, p->code, p->hour, p->minute);
+			i++;
+			p = p->next;
 		}
 	}
-
-	if (flag < 1)
-	{
-		printf("Error: no flights are scheduled for this hour. Please try again.\n");
-	}
-
 	printf("Returning to the main menu...\n");
 	return;
 }
-void empty_stdin(void) // helper function to avoid repeating error messages on wrong inputs
+void show_by_hours(int hour)
 {
-	int c = getchar();
+	Flight *p;
+	p = head;
+	int i = 1;
 
-	while (c != '\n' && c != EOF)
+	if (p == NULL)
 	{
-		c = getchar();
+		printf("Error: the schedule is empty. Please schedule a flight first.\n");
 	}
+	else
+	{
+		while (p != NULL)
+		{
+			if (p->hour == hour)
+			{
+				printf("%d. Code: %s Time: %d:%02d\n", i, p->code, p->hour, p->minute);
+			}
+			i++;
+			p = p->next;
+		}
+	}
+	printf("Returning to the main menu...\n");
+	return;
 }
 int check_duplicate(char code[SIZE])
 {
-	int i;
 	int flag = 0;
 	Flight *p;
-	p = Flights;
-	for (i = 0; i < SIZE; i++, p++)
+	p = head;
+	while (p != NULL)
 	{
 		if (strcmp(p->code, code) == 0)
 		{
 			flag++;
 		}
+		p = p->next;
 	}
 	return flag;
 }
 void deletebycode(char code[SIZE])
 {
-	int i, j;
-	Flight *p;
-	for (i = 0, p = Flights; i < SIZE; i++, p++)
+	Flight *this, *prev, *thisDel, *prevDel;
+	this = prev = head;
+	thisDel = prevDel = NULL;
+	if (this == NULL)
 	{
-		if (strcmp(p->code, code) == 0)
-		{
-			printf("Flight #%s at %d:%02d is deleted\n", p->code, p->hour, p->minute);
-			for (j = i; j < flightCount - 1; j++)
-			{
-				p[j - i] = p[j - i + 1];
-			}
-			flightCount--;
-			return;
-		}
+		printf("Error: the schedule is empty. Please schedule a flight first.\n");
+		return;
 	}
-	printf("Error: there is no such flight scheduled yet. Please try again.\n");
+	while (this != NULL)
+	{
+		if (strcmp(this->code, code) == 0)
+		{
+			thisDel = this;
+			prevDel = prev;
+			printf("Flight #%s at %d:%02d is deleted\n", thisDel->code, thisDel->hour, thisDel->minute);
+			break;
+		}
+		prev = this;
+		this = this->next;
+	}
+
+	if (thisDel == head)
+	{
+		head = head->next;
+		free(thisDel);
+	}
+	else
+	{
+		prevDel->next = thisDel->next;
+		free(thisDel);
+	}
+	printf("Returning to the main menu...\n");
 	return;
 }
 
@@ -264,14 +234,7 @@ int main(void)
 		{
 		case 1:
 			empty_stdin();
-			if (flightCount < SIZE)
-			{
-				insert();
-			}
-			else
-			{
-				printf("Error: the schedule is full. Please try again tomorrow.\n");
-			}
+			insert();
 			break;
 
 		case 2:
@@ -282,28 +245,20 @@ int main(void)
 		case 3:
 			empty_stdin();
 			int hour;
-			if (flightCount < 1)
+			printf("Please enter the hour you would like to search for:\n");
+			if (scanf("%d", &hour) != 1)
 			{
 				empty_stdin();
-				printf("Error: the schedule is empty. Please schedule a flight first.\n");
+				printf("Error: hour should be a single integer. Please try again.\n");
+			}
+			else if (hour < 0 || hour > 23)
+			{
+				printf("Error: hour can be an integer from 0 to 23. Please try again\n");
 			}
 			else
 			{
-				printf("Please enter the hour you would like to search for:\n");
-				if (scanf("%d", &hour) != 1)
-				{
-					empty_stdin();
-					printf("Error: hour should be a single integer. Please try again.\n");
-				}
-				else if (hour < 0 || hour > 23)
-				{
-					printf("Error: hour can be an integer from 0 to 23. Please try again\n");
-				}
-				else
-				{
-					empty_stdin();
-					show_by_hours(hour);
-				}
+				empty_stdin();
+				show_by_hours(hour);
 			}
 			break;
 
@@ -311,27 +266,20 @@ int main(void)
 			empty_stdin();
 			char code[SIZE];
 			printf("Please enter an alpha-numeric flight code (1 to 9 characters) you'd like to delete:\n");
-			if (flightCount < 1)
+			if (scanf("%s", code) != 1)
 			{
 				empty_stdin();
-				printf("The schedule is empty. Please schedule a flight first.\n");
+				printf("Error: you can enter only one code at a time. Please try again.\n");
+			}
+			else if (strlen(code) <= 0 || strlen(code) >= SIZE)
+			{
+				empty_stdin();
+				printf("Error: Code can be from 1 to 9 characters. Please try again.\n");
 			}
 			else
 			{
-				if (scanf("%s", code) != 1)
-				{
-					empty_stdin();
-					printf("Error: you can enter only one code at a time. Please try again.\n");
-				}
-				else if (strlen(code) <= 0 || strlen(code) >= SIZE)
-				{
-					printf("Error: Code can be from 1 to 9 characters. Please try again.\n");
-				}
-				else
-				{
-					empty_stdin();
-					deletebycode(code);
-				}
+				empty_stdin();
+				deletebycode(code);
 			}
 			break;
 
