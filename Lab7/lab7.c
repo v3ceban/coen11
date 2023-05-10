@@ -33,6 +33,8 @@ void show_all(void);
 void show_by_hours(int);
 int check_duplicate(char[SIZE]);
 void deletebycode(char[SIZE]);
+int save_to_file(void);
+void delete_all_flights(void);
 
 // Global variables
 Flight *head = NULL;
@@ -235,6 +237,37 @@ void deletebycode(char code[SIZE])
 	printf("Returning to the main menu...\n");
 	return;
 }
+int save_to_file(void)
+{
+	FILE *file;
+	Flight *this = head;
+	int i = 1;
+	if ((file = fopen("data.txt", "w")) == NULL)
+	{
+		printf("Error: couldn't open the file. Please check the file permissions. Aborting...\n");
+		return 1;
+	}
+	while (this != NULL)
+	{
+		fprintf(file, "%d. Code: %s Time: %d:%02d\n", i, this->code, this->hour, this->minute);
+		i++;
+		this = this->next;
+	}
+	fclose(file);
+	printf("All flights were saved to 'data.txt' file. ");
+	return 0;
+}
+void delete_all_flights(void)
+{
+	Flight *this;
+	this = head;
+	while (this != NULL)
+	{
+		head = this->next;
+		free(this);
+		this = head;
+	}
+}
 
 // Main
 int main(void)
@@ -306,8 +339,16 @@ int main(void)
 
 		case 0:
 			empty_stdin();
-			printf("Goodbye!\n");
-			return 0;
+			if (save_to_file() != 0)
+			{
+				return 1;
+			}
+			else
+			{
+				delete_all_flights();
+				printf("Goodbye!\n");
+				return 0;
+			}
 
 		default:
 			empty_stdin();
