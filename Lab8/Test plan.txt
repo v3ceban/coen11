@@ -1,0 +1,5 @@
+Test insert with all the improper values (e.g. hour <0 or >23, minute <0 or >59, code longer than 10 characters, etc)
+Try creating a file with no file created
+Try creating a file with a file already existing
+Check that nodes are deleting properly
+Check all other functions

@@ -52,7 +52,7 @@ void empty_stdin(void) // helper function to avoid repeating error messages on w
 
 void insert(void)
 {
-	int hour, minute, i;
+	int hour, minute;
 	char code[SIZE + 1];
 	Flight *new, *this, *prev;
 	if ((new = (Flight *)malloc(sizeof(Flight))) == (Flight *)NULL)
@@ -267,6 +267,7 @@ void delete_all_flights(void)
 		free(this);
 		this = head;
 	}
+	return;
 }
 
 // Main

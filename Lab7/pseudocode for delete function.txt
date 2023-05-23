@@ -1,0 +1,6 @@
+pointer to head
+while pointer is not NULL
+	move head to pointer-next
+	free pointer
+	move pointer to head
+return
