@@ -1,0 +1,3 @@
+1. Saving the list to a file in autosave
+2. Editing the list
+3. Saving the list to a file on exit
